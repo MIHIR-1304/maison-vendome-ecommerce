@@ -90,8 +90,10 @@ Assert-Test "Retrieve Shopping Cart" {
 $orderId = $null
 Assert-Test "Order Checkout (Server-side price & inventory lock)" {
     $body = @{
-        shippingAddress = "742 Evergreen Terrace, Springfield, OR"
-        phoneNumber = "+1-555-4321"
+        shippingAddress = "742 Evergreen Terrace"
+        city = "Springfield"
+        postalCode = "97477"
+        country = "United States"
     } | ConvertTo-Json
     $res = Invoke-RestMethod -Uri "$GatewayUrl/api/orders/checkout" -Method Post -Headers $global:headers -Body $body -ContentType "application/json"
     if (-not $res.id) { throw "Checkout did not return an order ID" }
@@ -114,7 +116,7 @@ Assert-Test "Initiate Payment Checkout Session" {
 
 Assert-Test "Complete Payment (Mock/Stripe Webhook Handshake)" {
     $res = Invoke-RestMethod -Uri "$GatewayUrl/api/payments/mock-complete/$global:sessionId" -Method Post
-    if ($res.paymentStatus -ne "COMPLETED") { throw "Expected COMPLETED status, got $($res.paymentStatus)" }
+    if ($res.status -ne "PAID") { throw "Expected PAID status, got $($res.status)" }
 }
 
 # 6. Verify Order Status Updated to PAID

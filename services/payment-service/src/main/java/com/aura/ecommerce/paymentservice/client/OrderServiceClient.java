@@ -26,7 +26,7 @@ public class OrderServiceClient {
     }
 
     public Optional<OrderRefDto> getOrderById(Long orderId) {
-        String url = orderServiceUrl + "/api/orders/" + orderId;
+        String url = orderServiceUrl + "/api/orders/" + orderId + "/internal";
         try {
             OrderRefDto order = restTemplate.getForObject(url, OrderRefDto.class);
             return Optional.ofNullable(order);

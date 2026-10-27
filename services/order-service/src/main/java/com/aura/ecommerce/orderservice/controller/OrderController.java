@@ -61,6 +61,12 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/{id}/internal")
+    @Operation(summary = "Internal order details lookup for Payment Service")
+    public ResponseEntity<OrderDto> getInternalOrderById(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.getOrderById(id, null, true));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get single order details by ID", security = @SecurityRequirement(name = "BearerAuth"))
     public ResponseEntity<OrderDto> getOrderById(

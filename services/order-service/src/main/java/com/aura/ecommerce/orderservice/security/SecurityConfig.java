@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Internal webhook callback from Payment Service
                         .requestMatchers(HttpMethod.POST, "/api/orders/*/internal-payment-update").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/*/internal").permitAll()
                         // Admin status mutation
                         .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status").hasRole("ADMIN")
                         .anyRequest().authenticated()
