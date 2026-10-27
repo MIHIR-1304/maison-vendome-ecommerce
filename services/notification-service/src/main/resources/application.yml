@@ -1,0 +1,41 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: notification-service
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ecommerce_notification
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+    show-sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+notification:
+  from-email: ${NOTIFICATION_FROM_EMAIL:no-reply@aurastore.com}
+  smtp:
+    enabled: ${SMTP_ENABLED:false}
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:2525}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.aura.ecommerce: INFO
