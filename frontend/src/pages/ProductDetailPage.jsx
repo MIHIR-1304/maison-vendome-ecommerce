@@ -39,7 +39,7 @@ export const ProductDetailPage = () => {
             categoryId: data.category.id,
             size: 4
           });
-          setRelatedProducts((relatedRes.content || []).filter((p) => p.id !== data.id).slice(0, 3));
+          setRelatedProducts((relatedRes?.content || []).filter((p) => p.id !== data.id).slice(0, 3));
         }
       } catch (err) {
         setError('Failed to load creation details. The piece may have been archived.');

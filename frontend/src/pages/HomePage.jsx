@@ -176,7 +176,7 @@ export const HomePage = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat) => (
+          {(Array.isArray(categories) ? categories : []).map((cat) => (
             <Link
               key={cat.id}
               to={`/products?category=${cat.slug}`}

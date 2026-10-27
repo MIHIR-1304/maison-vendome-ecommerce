@@ -48,7 +48,7 @@ export const ProductListPage = () => {
         setLoading(true);
 
         let categoryId = null;
-        if (categorySlug && categories.length > 0) {
+        if (categorySlug && Array.isArray(categories) && categories.length > 0) {
           const matched = categories.find((c) => c.slug === categorySlug);
           if (matched) categoryId = matched.id;
         }
@@ -148,7 +148,7 @@ export const ProductListPage = () => {
     }
   };
 
-  const activeCategory = categories.find((c) => c.slug === categorySlug);
+  const activeCategory = Array.isArray(categories) ? categories.find((c) => c.slug === categorySlug) : null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-sans">
@@ -186,7 +186,7 @@ export const ProductListPage = () => {
             >
               All Creations
             </button>
-            {categories.map((c) => (
+            {Array.isArray(categories) && categories.map((c) => (
               <button
                 key={c.id}
                 onClick={() => updateParam('category', c.slug)}

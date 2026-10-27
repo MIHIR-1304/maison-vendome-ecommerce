@@ -1,0 +1,11 @@
+{
+  "name": "maison-vendome-ecommerce",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Maison Vendôme Luxury E-Commerce Platform",
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev",
+    "test": "npm --prefix frontend test"
+  }
+}
