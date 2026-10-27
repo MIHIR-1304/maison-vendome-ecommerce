@@ -18,6 +18,7 @@ const requiredPages = [
   'AccountPage.jsx',
   'OrderHistoryPage.jsx',
   'OrderDetailPage.jsx',
+  'WishlistPage.jsx',
   'NotFoundPage.jsx',
 ];
 
@@ -41,7 +42,7 @@ for (const page of adminPages) {
 }
 
 // 3. Verify context providers exist
-const contexts = ['AuthContext.jsx', 'CartContext.jsx'];
+const contexts = ['AuthContext.jsx', 'CartContext.jsx', 'WishlistContext.jsx'];
 for (const ctx of contexts) {
   const filePath = path.join(process.cwd(), 'src', 'context', ctx);
   assert.ok(fs.existsSync(filePath), `Context missing: ${ctx}`);
