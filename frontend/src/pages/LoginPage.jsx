@@ -25,7 +25,12 @@ export const LoginPage = () => {
       await login({ email, password });
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.error || 'Invalid email or password. Please try again.');
+      setError(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        'Invalid email or password. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
@@ -42,8 +47,8 @@ export const LoginPage = () => {
       <div className="bg-white rounded-3xl border border-sand-200 shadow-xl p-8 space-y-8">
         
         <div className="text-center space-y-2">
-          <span className="font-serif text-3xl font-bold tracking-tight text-brand-950">
-            A U R A
+          <span className="font-serif text-2xl md:text-3xl font-bold tracking-widest text-brand-950 block">
+            MAISON VENDÔME
           </span>
           <h2 className="text-xl font-bold text-slate-800">Welcome Back</h2>
           <p className="text-xs text-slate-500">Sign in with your verified credentials</p>

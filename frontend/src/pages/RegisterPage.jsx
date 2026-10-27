@@ -33,7 +33,12 @@ export const RegisterPage = () => {
       await register(formData);
       navigate('/products');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please check your information.');
+      setError(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        'Registration failed. Please check your information.'
+      );
     } finally {
       setLoading(false);
     }
@@ -44,11 +49,11 @@ export const RegisterPage = () => {
       <div className="bg-white rounded-3xl border border-sand-200 shadow-xl p-8 space-y-8">
         
         <div className="text-center space-y-2">
-          <span className="font-serif text-3xl font-bold tracking-tight text-brand-950">
-            A U R A
+          <span className="font-serif text-2xl md:text-3xl font-bold tracking-widest text-brand-950 block">
+            MAISON VENDÔME
           </span>
-          <h2 className="text-xl font-bold text-slate-800">Create Your Account</h2>
-          <p className="text-xs text-slate-500">Join our exclusive private catalogue</p>
+          <h2 className="text-xl font-bold text-slate-800">Create Patron Account</h2>
+          <p className="text-xs text-slate-500">Join our exclusive private haute horlogerie & couture circle</p>
         </div>
 
         {error && <Alert type="error" message={error} />}
