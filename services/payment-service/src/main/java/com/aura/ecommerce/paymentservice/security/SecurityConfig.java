@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/payments/webhook",
                                 "/api/payments/mock-complete/**",
+                                "/api/payments/health",
                                 "/health",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
