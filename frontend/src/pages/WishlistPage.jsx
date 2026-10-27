@@ -13,13 +13,13 @@ export const WishlistPage = () => {
   const handleMoveToBag = async (product) => {
     try {
       setMovingId(product.id);
-      await addItem(product.id, 1);
+      await addItem(product.id, 1, product);
       setMovedIds((prev) => new Set(prev).add(product.id));
       setTimeout(() => {
         removeFromWishlist(product.id);
       }, 1000);
     } catch (err) {
-      alert(err.message || 'Please log in to add items to your shopping bag');
+      console.error('Error moving item to bag:', err);
     } finally {
       setMovingId(null);
     }

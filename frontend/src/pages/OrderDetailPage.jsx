@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Calendar, MapPin, ShieldCheck, CreditCard } from 'lucide-react';
+import { ChevronLeft, Calendar, MapPin, ShieldCheck, CreditCard, Sparkles, Package } from 'lucide-react';
 import { orderApi } from '../api/orderApi';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { Badge } from '../components/common/Badge';
 import { Alert } from '../components/common/Alert';
 
 export const OrderDetailPage = () => {
@@ -19,7 +18,7 @@ export const OrderDetailPage = () => {
         const data = await orderApi.getOrderById(id);
         setOrder(data);
       } catch (err) {
-        setError(err.response?.data?.error || 'Failed to load order details');
+        setError(err.response?.data?.error || 'Failed to load order dossier');
       } finally {
         setLoading(false);
       }
@@ -29,35 +28,41 @@ export const OrderDetailPage = () => {
   }, [id]);
 
   if (loading) {
-    return <LoadingSpinner text="Retrieving order snapshot..." />;
+    return <LoadingSpinner text="Retrieving Maison Vendôme consignment snapshot..." />;
   }
 
   if (error || !order) {
     return (
       <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-4">
-        <Alert type="error" message={error || 'Order not found'} />
-        <Link to="/orders" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700">
-          <ChevronLeft className="w-4 h-4" /> Return to Orders
+        <Alert type="error" message={error || 'Consignment record not found'} />
+        <Link to="/orders" className="inline-flex items-center gap-2 text-sm font-semibold text-amber-900">
+          <ChevronLeft className="w-4 h-4" /> Return to Consignments
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 font-sans">
       
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-sand-200">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-amber-900/10">
         <div>
           <div className="flex items-center gap-3">
-            <Link to="/orders" className="p-1.5 rounded-full hover:bg-sand-100 text-slate-500">
+            <Link to="/orders" className="p-2 rounded-full hover:bg-amber-100/50 text-slate-500 transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </Link>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brand-950">
-              Order {order.orderNumber}
-            </h1>
+            <div>
+              <span className="text-[10px] uppercase tracking-widest text-amber-800 font-semibold block">
+                Consignment Dossier
+              </span>
+              <h1 className="font-serif text-2xl sm:text-3xl font-medium text-slate-950">
+                {order.orderNumber}
+              </h1>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 ml-9 mt-0.5">
-            Placed on {new Date(order.createdAt).toLocaleDateString(undefined, {
+          <p className="text-xs text-slate-500 ml-12 mt-1">
+            Registered on {new Date(order.createdAt).toLocaleDateString(undefined, {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -66,96 +71,103 @@ export const OrderDetailPage = () => {
             })}
           </p>
         </div>
-        <div className="ml-9 sm:ml-0">
-          <Badge status={order.status} className="text-sm px-3 py-1" />
+        <div className="ml-12 sm:ml-0">
+          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+            order.status === 'PAID'
+              ? 'bg-emerald-100 text-emerald-800'
+              : order.status === 'FULFILLED'
+                ? 'bg-blue-100 text-blue-800'
+                : order.status === 'PENDING_PAYMENT'
+                  ? 'bg-amber-100 text-amber-800'
+                  : 'bg-rose-100 text-rose-800'
+          }`}>
+            {order.status}
+          </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Shipping Address */}
-        <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-2xs space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-            <MapPin className="w-4 h-4 text-brand-600" />
-            <span>Shipping Destination</span>
+        {/* Shipping Destination */}
+        <div className="bg-white p-5 rounded-2xl border border-amber-900/10 shadow-sm space-y-2">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-900">
+            <MapPin className="w-4 h-4 text-amber-700" />
+            <span>Courier Destination</span>
           </div>
-          <p className="text-sm font-bold text-slate-800">{order.customerName}</p>
+          <p className="text-sm font-serif font-medium text-slate-900">{order.customerName}</p>
           <p className="text-xs text-slate-600">{order.shippingAddress}</p>
           <p className="text-xs text-slate-600">{order.city}, {order.postalCode}</p>
           <p className="text-xs text-slate-600">{order.country}</p>
         </div>
 
-        {/* Customer Contact */}
-        <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-2xs space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-brand-600" />
-            <span>Customer Account</span>
+        {/* Patron Account */}
+        <div className="bg-white p-5 rounded-2xl border border-amber-900/10 shadow-sm space-y-2">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-900">
+            <ShieldCheck className="w-4 h-4 text-amber-700" />
+            <span>Patron Credentials</span>
           </div>
-          <p className="text-sm font-bold text-slate-800">{order.customerEmail}</p>
-          <p className="text-xs text-slate-500">User ID: #{order.userId}</p>
-          <p className="text-xs text-slate-500">Status: {order.status}</p>
+          <p className="text-sm font-serif font-medium text-slate-900">{order.customerEmail}</p>
+          <p className="text-xs text-slate-500">Patron Registry ID: #{order.userId}</p>
+          <p className="text-xs text-slate-500">Maison VIP Client Tier</p>
         </div>
 
         {/* Payment Reference */}
-        <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-2xs space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-            <CreditCard className="w-4 h-4 text-brand-600" />
-            <span>Payment Session</span>
+        <div className="bg-white p-5 rounded-2xl border border-amber-900/10 shadow-sm space-y-2">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-900">
+            <CreditCard className="w-4 h-4 text-amber-700" />
+            <span>Settlement Ledger</span>
           </div>
-          <p className="text-xs font-mono text-slate-700 truncate">
-            {order.paymentSessionId || 'Session ID pending'}
+          <p className="text-lg font-serif font-medium text-slate-900 font-mono">
+            ${Number(order.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
-          {order.paymentId && (
-            <p className="text-[11px] font-mono text-emerald-700 truncate">
-              Payment ID: {order.paymentId}
-            </p>
-          )}
+          <p className="text-xs text-slate-500">Payment Reference: {order.paymentSessionId || 'Secured Provider'}</p>
+          <p className="text-[11px] text-emerald-700 font-semibold">White-Glove Delivery Included</p>
         </div>
 
       </div>
 
-      {/* Immutable Purchased Line Items */}
-      <div className="bg-white rounded-3xl border border-sand-200 overflow-hidden shadow-xs">
-        <div className="px-6 py-4 border-b border-sand-200 bg-sand-50/50">
-          <h3 className="text-sm font-bold text-slate-900">Purchased Items Snapshot</h3>
-        </div>
+      {/* Order Line Items Snapshot */}
+      <div className="bg-white rounded-2xl border border-amber-900/10 p-6 shadow-sm space-y-4">
+        <h3 className="font-serif text-lg font-medium text-slate-950 border-b border-amber-900/10 pb-3">
+          Acquired Creations ({order.items?.length || 0})
+        </h3>
 
-        <div className="divide-y divide-sand-100">
-          {order.items?.map((item) => (
-            <div key={item.id} className="p-6 flex items-center justify-between gap-4">
-              <div>
-                <p className="font-semibold text-sm text-slate-900">{item.productName}</p>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  ${Number(item.unitPrice).toFixed(2)} &times; {item.quantity} {item.quantity === 1 ? 'unit' : 'units'}
-                </p>
+        <div className="divide-y divide-slate-100">
+          {(order.items || []).map((item) => (
+            <div key={item.id} className="py-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-100">
+                  <img
+                    src={item.imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=300&q=80'}
+                    alt={item.productName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <Link
+                    to={`/products/${item.productId}`}
+                    className="font-serif font-medium text-slate-900 hover:text-amber-800 text-sm line-clamp-1"
+                  >
+                    {item.productName}
+                  </Link>
+                  <p className="text-xs font-mono text-slate-500 mt-0.5">
+                    Qty: {item.quantity} × ${Number(item.unitPrice).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
               </div>
-              <span className="font-bold text-sm text-slate-950">
-                ${Number(item.totalPrice).toFixed(2)}
+
+              <span className="font-serif font-medium text-slate-950 font-mono text-base">
+                ${Number(item.lineTotal || item.unitPrice * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
             </div>
           ))}
         </div>
 
-        {/* Totals Summary */}
-        <div className="p-6 bg-sand-50/70 border-t border-sand-200 space-y-2 text-xs sm:text-sm">
-          <div className="flex justify-between text-slate-600">
-            <span>Subtotal</span>
-            <span className="font-semibold text-slate-900">${Number(order.subtotal).toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-slate-600">
-            <span>Shipping</span>
-            <span className="font-semibold text-slate-900">
-              {Number(order.shippingFee) === 0 ? 'FREE' : `$${Number(order.shippingFee).toFixed(2)}`}
-            </span>
-          </div>
-          <div className="flex justify-between text-slate-600">
-            <span>Taxes</span>
-            <span className="font-semibold text-slate-900">${Number(order.tax).toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-base font-bold text-slate-950 pt-3 border-t border-sand-200">
-            <span>Grand Total</span>
-            <span className="text-xl text-brand-950">${Number(order.totalAmount).toFixed(2)} USD</span>
-          </div>
+        <div className="pt-4 border-t border-amber-900/10 flex justify-between items-baseline">
+          <span className="font-serif text-base font-normal text-slate-900">Total Settled</span>
+          <span className="font-serif text-2xl font-normal text-amber-900 font-mono">
+            ${Number(order.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </span>
         </div>
       </div>
 
