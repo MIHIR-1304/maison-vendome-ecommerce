@@ -33,6 +33,39 @@ export const CheckoutPage = () => {
     }
   }, [items, mockSession, navigate]);
 
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-6">
+        <div className="w-16 h-16 mx-auto rounded-full bg-amber-100/60 flex items-center justify-center text-slate-800 border border-amber-900/10">
+          <Lock className="w-8 h-8 text-amber-800" />
+        </div>
+        <div className="space-y-2">
+          <span className="text-[11px] uppercase tracking-[0.3em] font-semibold text-amber-800">
+            Maison Vendôme Checkout
+          </span>
+          <h2 className="font-serif text-3xl font-medium text-slate-950">Identification Requise</h2>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Please sign in to your Maison VIP account or create a new account to complete your secure consignment.
+          </p>
+        </div>
+        <div className="pt-2 flex flex-col gap-3">
+          <Link
+            to="/login?redirect=/checkout"
+            className="w-full py-3.5 rounded-full bg-slate-950 text-amber-200 text-xs uppercase tracking-widest font-semibold hover:bg-slate-800 transition-colors shadow-md"
+          >
+            Sign In to Complete Order
+          </Link>
+          <Link
+            to="/register?redirect=/checkout"
+            className="w-full py-3.5 rounded-full border border-amber-900/20 text-slate-800 text-xs uppercase tracking-widest font-semibold hover:bg-amber-100/40 transition-colors"
+          >
+            Create Private Maison Account
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const handleInputChange = (e) => {
     setShippingAddress({ ...shippingAddress, [e.target.name]: e.target.value });
   };

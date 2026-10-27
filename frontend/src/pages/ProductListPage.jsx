@@ -132,7 +132,7 @@ export const ProductListPage = () => {
     e.stopPropagation();
     try {
       setAddingId(product.id);
-      await addItem(product.id, 1);
+      await addItem(product.id, 1, product);
       setAddedIds((prev) => new Set(prev).add(product.id));
       setTimeout(() => {
         setAddedIds((prev) => {
@@ -140,9 +140,9 @@ export const ProductListPage = () => {
           next.delete(product.id);
           return next;
         });
-      }, 2000);
+      }, 2500);
     } catch (err) {
-      alert(err.message || 'Please log in to add items to your shopping bag');
+      console.error('Error adding item to bag:', err);
     } finally {
       setAddingId(null);
     }

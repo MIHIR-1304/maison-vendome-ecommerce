@@ -17,7 +17,7 @@ export default function QuickViewModal({ product, onClose }) {
 
   const handleAddToCart = async () => {
     try {
-      await addItem(product.id, quantity);
+      await addItem(product.id, quantity, product);
       setAdded(true);
       setTimeout(() => setAdded(false), 2500);
     } catch (err) {

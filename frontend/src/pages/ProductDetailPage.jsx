@@ -56,15 +56,11 @@ export const ProductDetailPage = () => {
     setError(null);
     try {
       setAdding(true);
-      await addItem(product.id, quantity);
+      await addItem(product.id, quantity, product);
       setAddedSuccess(true);
       setTimeout(() => setAddedSuccess(false), 2500);
     } catch (err) {
-      if (err.message && err.message.includes('sign in')) {
-        navigate('/login', { state: { from: { pathname: `/products/${id}` } } });
-      } else {
-        setError(err.response?.data?.error || err.message || 'Failed to add item to your shopping bag');
-      }
+      setError(err.response?.data?.error || err.message || 'Failed to add item to your shopping bag');
     } finally {
       setAdding(false);
     }

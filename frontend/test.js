@@ -41,7 +41,24 @@ for (const page of adminPages) {
   console.log(`  ✓ Admin page verified: ${page}`);
 }
 
-// 3. Verify context providers exist
+// 3. Verify smart category & cart drawer components exist
+const components = [
+  path.join('components', 'navigation', 'CategoryNav.jsx'),
+  path.join('components', 'navigation', 'CategoryDrawer.jsx'),
+  path.join('components', 'cart', 'CartDrawer.jsx'),
+  path.join('components', 'home', 'SmartCategoryGrids.jsx'),
+  path.join('components', 'common', 'QuickViewModal.jsx'),
+  path.join('components', 'layout', 'Navbar.jsx'),
+  path.join('components', 'layout', 'Footer.jsx'),
+];
+
+for (const comp of components) {
+  const filePath = path.join(process.cwd(), 'src', comp);
+  assert.ok(fs.existsSync(filePath), `Component missing: ${comp}`);
+  console.log(`  ✓ Component verified: ${comp}`);
+}
+
+// 4. Verify context providers exist
 const contexts = ['AuthContext.jsx', 'CartContext.jsx', 'WishlistContext.jsx'];
 for (const ctx of contexts) {
   const filePath = path.join(process.cwd(), 'src', 'context', ctx);
@@ -49,4 +66,4 @@ for (const ctx of contexts) {
   console.log(`  ✓ Context verified: ${ctx}`);
 }
 
-console.log('All 18 frontend components and views passed structural and functional verification!');
+console.log('All 24 frontend components, views, and smart Amazon-style category modules verified successfully!');

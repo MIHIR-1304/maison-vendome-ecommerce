@@ -1,99 +1,129 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, ArrowRight, ShoppingBag, ShieldCheck, ChevronLeft } from 'lucide-react';
+import { 
+  Trash2, ArrowRight, ShoppingBag, ShieldCheck, ChevronLeft, 
+  Sparkles, Truck, Lock, Plus, Minus, UserCheck 
+} from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const CartPage = () => {
-  const { cart, items, totalItems, subtotal, loading, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { items, totalItems, subtotal, loading, updateQuantity, removeFromCart, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const freeShippingThreshold = 150;
-  const isFreeShipping = Number(subtotal) >= freeShippingThreshold;
-  const amountToFreeShipping = Math.max(0, freeShippingThreshold - Number(subtotal));
-
-  if (!user) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-6">
-        <div className="w-16 h-16 mx-auto rounded-full bg-sand-100 flex items-center justify-center text-brand-950">
-          <ShoppingBag className="w-8 h-8" />
-        </div>
-        <h2 className="font-serif text-3xl font-bold text-slate-800">Your Cart Awaits</h2>
-        <p className="text-sm text-slate-500">
-          Please sign in to view your saved cart items or create a new order.
-        </p>
-        <Link
-          to="/login"
-          state={{ from: { pathname: '/cart' } }}
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-brand-950 text-white font-bold text-sm hover:bg-brand-900 transition-colors shadow-md"
-        >
-          Sign In to Access Cart
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
-    );
-  }
+  const freeShippingThreshold = 500;
+  const currentSubtotal = Number(subtotal) || 0;
+  const isFreeShipping = currentSubtotal >= freeShippingThreshold;
+  const amountToFreeShipping = Math.max(0, freeShippingThreshold - currentSubtotal);
+  const progressPercent = Math.min(100, Math.round((currentSubtotal / freeShippingThreshold) * 100));
 
   if (loading && items.length === 0) {
-    return <LoadingSpinner text="Retrieving your shopping cart..." />;
+    return <LoadingSpinner text="Retrieving Maison Vendôme archival records..." />;
   }
 
+  // If cart is empty (for both guest and authenticated user)
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-6">
-        <div className="w-20 h-20 mx-auto rounded-full bg-sand-100 flex items-center justify-center text-slate-400">
-          <ShoppingBag className="w-10 h-10" />
+      <div className="max-w-md mx-auto px-4 py-24 text-center space-y-6">
+        <div className="w-20 h-20 mx-auto rounded-full bg-amber-100/60 flex items-center justify-center text-amber-900/60 border border-amber-900/10">
+          <ShoppingBag className="w-9 h-9" />
         </div>
-        <h2 className="font-serif text-3xl font-bold text-slate-900">Your Cart is Empty</h2>
-        <p className="text-sm text-slate-500">
-          Explore our collection of fine artisan craft, luxury audio gear, and timepieces.
-        </p>
+        <div className="space-y-2">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-amber-800 font-semibold block">
+            Maison Vendôme Bag
+          </span>
+          <h2 className="font-serif text-3xl font-medium text-slate-950">Votre Sac d'Achats Est Vide</h2>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+            Your shopping bag is currently empty. Explore our hand-crafted timepieces, fine leather goods, and timeless creations.
+          </p>
+        </div>
         <Link
           to="/products"
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-brand-950 text-white font-bold text-sm hover:bg-brand-900 transition-colors shadow-md"
+          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-slate-950 text-amber-200 text-xs uppercase tracking-widest font-semibold hover:bg-slate-800 transition-colors shadow-md"
         >
-          Browse Catalogue
+          Explore Creations
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     );
   }
 
+  const handleCheckout = () => {
+    if (!user) {
+      navigate('/login?redirect=/checkout');
+    } else {
+      navigate('/checkout');
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 font-sans">
       
-      <div className="flex items-center justify-between pb-6 border-b border-sand-200">
+      {/* Editorial Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-6 border-b border-amber-900/10 gap-4">
         <div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brand-950">
-            Shopping Cart
+          <span className="text-[11px] uppercase tracking-[0.3em] font-semibold text-amber-800 block">
+            Maison Vendôme Paris
+          </span>
+          <h1 className="font-serif text-3xl sm:text-5xl font-normal text-slate-950 mt-1">
+            Votre Sac d'Achats
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            {totalItems} {totalItems === 1 ? 'item' : 'items'} in your personal bag
+            {totalItems} {totalItems === 1 ? 'exceptional creation' : 'exceptional creations'} reserved in your bag
           </p>
         </div>
-        <button
-          onClick={clearCart}
-          className="text-xs font-semibold text-rose-600 hover:text-rose-800 transition-colors"
-        >
-          Clear Bag
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={clearCart}
+            className="text-xs uppercase tracking-wider font-semibold text-slate-500 hover:text-rose-600 transition-colors"
+          >
+            Clear Bag
+          </button>
+        </div>
       </div>
 
-      {/* Free Shipping Notification Progress */}
-      <div className="p-4 bg-white rounded-2xl border border-sand-200 shadow-2xs space-y-2">
-        <div className="flex justify-between text-xs font-semibold">
-          <span className="text-slate-800">
-            {isFreeShipping ? '🎉 You have unlocked complimentary express delivery!' : `Add $${amountToFreeShipping.toFixed(2)} more for complimentary shipping`}
-          </span>
-          <span className="text-slate-500">${Number(subtotal).toFixed(2)} / $150.00</span>
+      {/* Guest Notice (if not signed in) */}
+      {!user && (
+        <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5 text-amber-900">
+            <UserCheck className="w-4 h-4 text-amber-700 flex-shrink-0" />
+            <span>
+              Shopping as a <strong>Valued Guest</strong>. Sign in to link these creations to your Maison VIP account.
+            </span>
+          </div>
+          <Link
+            to="/login?redirect=/cart"
+            className="inline-flex items-center gap-1.5 font-semibold text-amber-950 hover:underline uppercase tracking-wider text-[11px]"
+          >
+            Sign In Now <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
-        <div className="w-full h-2 bg-sand-100 rounded-full overflow-hidden">
+      )}
+
+      {/* Complimentary White-Glove Shipping Progress */}
+      <div className="p-5 bg-white rounded-2xl border border-amber-900/10 shadow-sm space-y-2">
+        <div className="flex justify-between items-center text-xs font-semibold">
+          <span className="text-slate-800 flex items-center gap-2">
+            <Truck className="w-4 h-4 text-amber-700" />
+            {isFreeShipping ? (
+              <span className="text-emerald-700">
+                🎉 Félicitations! You have unlocked Complimentary White-Glove Courier Delivery.
+              </span>
+            ) : (
+              <span>
+                Add <strong className="text-slate-950">${amountToFreeShipping.toFixed(2)}</strong> more to unlock Complimentary White-Glove Courier Delivery
+              </span>
+            )}
+          </span>
+          <span className="text-slate-500 font-mono text-[11px]">{progressPercent}%</span>
+        </div>
+        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-emerald-600 rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(100, (Number(subtotal) / 150) * 100)}%` }}
-          ></div>
+            className="h-full bg-gradient-to-r from-amber-600 to-amber-500 rounded-full transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
 
@@ -103,63 +133,74 @@ export const CartPage = () => {
         <div className="lg:col-span-8 space-y-4">
           {items.map((item) => (
             <div
-              key={item.id}
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 bg-white rounded-2xl border border-sand-200 gap-4 shadow-2xs hover:border-sand-300 transition-colors"
+              key={item.id || item.productId}
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 bg-white rounded-2xl border border-amber-900/10 gap-4 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-xl overflow-hidden bg-sand-100 flex-shrink-0 border border-sand-200">
+                <Link
+                  to={`/products/${item.productId}`}
+                  className="w-24 h-24 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-100 relative group"
+                >
                   <img
-                    src={item.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80'}
+                    src={item.imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=300&q=80'}
                     alt={item.productName}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
-                </div>
+                </Link>
                 <div>
+                  <span className="text-[10px] uppercase tracking-widest text-amber-800 font-semibold block">
+                    Maison Selection
+                  </span>
                   <Link
                     to={`/products/${item.productId}`}
-                    className="font-semibold text-sm sm:text-base text-slate-900 hover:text-brand-700 line-clamp-1"
+                    className="font-serif text-base sm:text-lg font-medium text-slate-900 hover:text-amber-800 transition-colors line-clamp-1"
                   >
                     {item.productName}
                   </Link>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Unit Price: ${Number(item.unitPrice).toFixed(2)}
+                  <p className="text-xs font-mono text-slate-500 mt-1">
+                    ${Number(item.unitPrice).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </p>
                   {item.availableStock !== undefined && item.availableStock < item.quantity && (
                     <span className="inline-block mt-1 text-[11px] text-amber-700 font-semibold">
-                      Only {item.availableStock} in stock
+                      Only {item.availableStock} in atelier stock
                     </span>
                   )}
                 </div>
               </div>
 
               {/* Quantity Controls & Line Total */}
-              <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-sand-100">
-                <div className="flex items-center border border-sand-300 rounded-full bg-sand-50/50 px-2 py-0.5">
+              <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-slate-100">
+                <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 overflow-hidden">
                   <button
                     onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                    className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-950 font-bold"
+                    disabled={loading}
+                    className="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors disabled:opacity-40"
+                    aria-label="Decrease quantity"
                   >
-                    -
+                    <Minus className="w-3.5 h-3.5" />
                   </button>
-                  <span className="w-7 text-center text-xs font-bold text-slate-900">
+                  <span className="w-8 text-center text-xs font-mono font-bold text-slate-900">
                     {item.quantity}
                   </span>
                   <button
                     onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                    className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-950 font-bold"
+                    disabled={loading || (item.availableStock && item.quantity >= item.availableStock)}
+                    className="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors disabled:opacity-40"
+                    aria-label="Increase quantity"
                   >
-                    +
+                    <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <span className="font-bold text-slate-950 text-base sm:w-24 text-right">
-                  ${Number(item.lineTotal).toFixed(2)}
+                <span className="font-serif font-bold text-slate-950 text-lg sm:w-28 text-right font-mono">
+                  ${Number(item.lineTotal || item.unitPrice * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </span>
 
                 <button
                   onClick={() => removeFromCart(item.productId)}
                   className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
                   aria-label="Remove Item"
+                  title="Remove from bag"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -170,56 +211,74 @@ export const CartPage = () => {
           <div className="pt-2">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 hover:text-brand-950"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold text-amber-900 hover:text-amber-700 transition-colors"
             >
-              <ChevronLeft className="w-4 h-4" /> Continue Shopping
+              <ChevronLeft className="w-4 h-4" /> Continuer Vos Découvertes (Continue Shopping)
             </Link>
           </div>
         </div>
 
         {/* Order Summary Checkout Card */}
-        <div className="lg:col-span-4 bg-white rounded-3xl border border-sand-200 p-6 sm:p-8 space-y-6 shadow-md">
-          <h3 className="font-serif text-xl font-bold text-brand-950 border-b border-sand-200 pb-4">
-            Order Summary
-          </h3>
+        <div className="lg:col-span-4 bg-white rounded-3xl border border-amber-900/10 p-6 sm:p-8 space-y-6 shadow-md">
+          <div className="border-b border-amber-900/10 pb-4">
+            <span className="text-[10px] uppercase tracking-widest text-amber-800 font-semibold block">
+              Sommaire de la Commande
+            </span>
+            <h3 className="font-serif text-2xl font-normal text-slate-950 mt-1">
+              Order Summary
+            </h3>
+          </div>
 
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between text-slate-600">
-              <span>Subtotal ({totalItems} items)</span>
-              <span className="font-semibold text-slate-900">${Number(subtotal).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-slate-600">
-              <span>Estimated Shipping</span>
-              <span className="font-semibold text-slate-900">
-                {isFreeShipping ? 'FREE' : '$15.00'}
+          <div className="space-y-3.5 text-xs text-slate-600">
+            <div className="flex justify-between">
+              <span>Subtotal ({totalItems} {totalItems === 1 ? 'creation' : 'creations'})</span>
+              <span className="font-serif font-medium text-slate-900 font-mono text-sm">
+                ${currentSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
             </div>
-            <div className="flex justify-between text-slate-600">
-              <span>Estimated Tax (8%)</span>
+            <div className="flex justify-between">
+              <span>White-Glove Courier Delivery</span>
               <span className="font-semibold text-slate-900">
-                ${(Number(subtotal) * 0.08).toFixed(2)}
+                {isFreeShipping ? 'Complimentary' : '$25.00'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Signature Gift Packaging & Wax Seal</span>
+              <span className="text-amber-800 font-medium">Included</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Estimated VAT / Duties</span>
+              <span className="font-serif font-medium text-slate-900 font-mono text-sm">
+                ${(currentSubtotal * 0.08).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
             </div>
 
-            <div className="pt-4 border-t border-sand-200 flex justify-between text-base font-bold text-slate-950">
-              <span>Estimated Total</span>
-              <span className="text-xl">
-                ${(Number(subtotal) + (isFreeShipping ? 0 : 15) + Number(subtotal) * 0.08).toFixed(2)}
+            <div className="pt-4 border-t border-amber-900/10 flex justify-between items-baseline text-slate-950">
+              <span className="text-sm font-semibold uppercase tracking-wider">Total</span>
+              <span className="font-serif text-2xl font-normal font-mono text-amber-900">
+                ${(currentSubtotal + (isFreeShipping ? 0 : 25) + currentSubtotal * 0.08).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
             </div>
           </div>
 
           <button
-            onClick={() => navigate('/checkout')}
-            className="w-full py-4 rounded-full bg-brand-950 text-white font-bold text-sm hover:bg-brand-900 transition-all shadow-md flex items-center justify-center gap-2"
+            onClick={handleCheckout}
+            className="w-full py-4 rounded-xl bg-slate-950 text-amber-200 text-xs uppercase tracking-widest font-semibold hover:bg-slate-800 transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
           >
-            Proceed to Checkout
+            <Lock className="w-4 h-4 text-amber-400" />
+            Passer la Commande (Checkout)
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center justify-center gap-2 text-xs text-slate-400 text-center">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Encrypted checkout & Stripe Test Provider</span>
+          <div className="pt-2 border-t border-slate-100 space-y-2 text-[11px] text-slate-500">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-amber-700 flex-shrink-0" />
+              <span>Authenticity & Atelier Certificate Included</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-700 flex-shrink-0" />
+              <span>Complimentary 30-Day Insured Return Transit</span>
+            </div>
           </div>
         </div>
 

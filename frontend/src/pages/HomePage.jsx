@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, ShieldCheck, Award, ArrowUpRight, ShoppingBag, Eye, Heart, Compass, Check } from 'lucide-react';
+import { 
+  ArrowRight, Sparkles, ShieldCheck, Award, ArrowUpRight, ShoppingBag, 
+  Eye, Heart, Compass, Check 
+} from 'lucide-react';
 import { productApi } from '../api/productApi';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import QuickViewModal from '../components/common/QuickViewModal';
+import SmartCategoryGrids from '../components/home/SmartCategoryGrids';
 
 export const HomePage = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -42,7 +46,7 @@ export const HomePage = () => {
     e.stopPropagation();
     try {
       setAddingId(product.id);
-      await addItem(product.id, 1);
+      await addItem(product.id, 1, product);
       setAddedIds((prev) => new Set(prev).add(product.id));
       setTimeout(() => {
         setAddedIds((prev) => {
@@ -50,23 +54,22 @@ export const HomePage = () => {
           next.delete(product.id);
           return next;
         });
-      }, 2000);
+      }, 2500);
     } catch (err) {
-      alert(err.message || 'Please log in to add items to your shopping bag');
+      console.error('Failed to add item to bag:', err);
     } finally {
       setAddingId(null);
     }
   };
 
   return (
-    <div className="space-y-24 pb-20 font-sans">
+    <div className="space-y-16 pb-20 font-sans">
       
       {/* Grand Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white border-b border-amber-900/20">
-        {/* Subtle Luxury Pattern / Texture */}
         <div className="absolute inset-0 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:32px_32px] opacity-10 pointer-events-none"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-36 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Left Narrative */}
@@ -128,7 +131,6 @@ export const HomePage = () => {
                   className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 
-                {/* Floating Showcase Pill */}
                 <div className="absolute bottom-6 left-6 right-6 p-5 rounded-2xl bg-slate-950/85 backdrop-blur-md border border-amber-500/30 text-white flex items-center justify-between gap-4">
                   <div>
                     <span className="text-[10px] uppercase tracking-[0.2em] text-amber-300 font-semibold block">Piece Unique</span>
@@ -149,6 +151,9 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Amazon-Style Smart 4-in-1 Categories Section */}
+      <SmartCategoryGrids />
 
       {/* Curated Categories Spotlights */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -179,7 +184,6 @@ export const HomePage = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent z-10 opacity-80 group-hover:opacity-70 transition-opacity"></div>
               
-              {/* Category Background Imagery */}
               <div className="w-full h-full bg-slate-800">
                 <img
                   src={
@@ -248,92 +252,104 @@ export const HomePage = () => {
               return (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-2xl border border-amber-900/10 overflow-hidden flex flex-col justify-between hover:shadow-xl transition-all duration-300 relative"
+                  className="group relative bg-white rounded-2xl overflow-hidden border border-amber-900/10 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
                 >
-                  {/* Image & Quick Actions */}
-                  <div className="relative aspect-square bg-slate-100 overflow-hidden">
-                    <Link to={`/products/${product.id}`} className="block w-full h-full">
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                      />
-                    </Link>
+                  <div className="relative aspect-square overflow-hidden bg-slate-100">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
 
-                    {/* Wishlist Toggle */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleWishlist(product);
-                      }}
-                      className={`absolute top-3 right-3 p-2.5 rounded-full backdrop-blur-md shadow-sm transition-all ${
-                        inWishlist
-                          ? 'bg-rose-50 text-rose-600'
-                          : 'bg-white/80 text-slate-700 hover:bg-white hover:text-rose-600'
-                      }`}
-                      aria-label="Wishlist"
-                    >
-                      <Heart className={`w-4 h-4 ${inWishlist ? 'fill-current' : ''}`} />
-                    </button>
+                    {/* Stock / Atelier Badge */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                      {isOutOfStock ? (
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-900/80 text-rose-100 backdrop-blur-md">
+                          Archived
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-900/80 text-amber-300 backdrop-blur-md">
+                          Atelier Stock: {product.stockQuantity}
+                        </span>
+                      )}
+                    </div>
 
-                    {/* Quick View Button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setQuickViewProduct(product);
-                      }}
-                      className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-slate-950/85 text-amber-100 text-xs uppercase tracking-wider font-semibold opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-md flex items-center gap-1.5 shadow-lg hover:bg-slate-900"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Quick View
-                    </button>
+                    {/* Action Overlay: Wishlist & Quick View */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleWishlist(product);
+                        }}
+                        className={`p-2.5 rounded-full backdrop-blur-md transition-all shadow ${
+                          inWishlist
+                            ? 'bg-rose-50 text-rose-600'
+                            : 'bg-white/80 text-slate-700 hover:text-rose-600 hover:bg-white'
+                        }`}
+                        title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                      >
+                        <Heart className={`w-4 h-4 ${inWishlist ? 'fill-current' : ''}`} />
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setQuickViewProduct(product);
+                        }}
+                        className="p-2.5 rounded-full bg-white/80 backdrop-blur-md text-slate-700 hover:text-slate-950 hover:bg-white transition-all shadow opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-200"
+                        title="Quick View Piece"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Details */}
-                  <div className="p-5 flex flex-col flex-1 justify-between">
-                    <div>
-                      <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-amber-900/70 mb-1 block">
-                        {product.category?.name || 'Maison Creation'}
-                      </span>
-                      <Link to={`/products/${product.id}`}>
-                        <h3 className="font-serif text-lg text-slate-900 group-hover:text-amber-800 transition-colors font-normal leading-snug">
-                          {product.name}
-                        </h3>
+                  <div className="p-6 flex flex-col justify-between flex-1">
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-amber-800">
+                        {product.category?.name || 'Maison Vendôme'}
+                      </p>
+                      <Link
+                        to={`/products/${product.id}`}
+                        className="font-serif text-lg font-medium text-slate-950 hover:text-amber-800 transition-colors line-clamp-1 block"
+                      >
+                        {product.name}
                       </Link>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                         {product.description}
                       </p>
                     </div>
 
-                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-                      <span className="font-serif text-xl text-slate-950">
-                        ${Number(product.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                      </span>
+                    <div className="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider text-slate-400 block font-medium">Prix d'Atelier</span>
+                        <span className="font-serif text-xl font-normal text-slate-950 font-mono">
+                          ${Number(product.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
 
                       <button
-                        type="button"
                         onClick={(e) => handleQuickAdd(e, product)}
                         disabled={isOutOfStock || addingId === product.id}
-                        className={`px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+                        className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs uppercase tracking-wider font-semibold transition-all ${
                           isAdded
-                            ? 'bg-emerald-800 text-white'
+                            ? 'bg-emerald-600 text-white shadow'
                             : isOutOfStock
-                              ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                              : 'bg-slate-900 text-amber-100 hover:bg-slate-800'
+                              ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                              : 'bg-slate-950 text-amber-200 hover:bg-slate-800 shadow-md active:scale-95'
                         }`}
                       >
                         {isAdded ? (
                           <>
-                            <Check className="w-3.5 h-3.5" /> Added
+                            <Check className="w-3.5 h-3.5" />
+                            <span>In Bag</span>
                           </>
+                        ) : addingId === product.id ? (
+                          <span>Adding...</span>
                         ) : (
                           <>
                             <ShoppingBag className="w-3.5 h-3.5" />
-                            {isOutOfStock ? 'Sold' : 'Add to Bag'}
+                            <span>Add to Bag</span>
                           </>
                         )}
                       </button>
@@ -346,52 +362,6 @@ export const HomePage = () => {
         )}
       </section>
 
-      {/* Savoir-Faire Editorial Storytelling Section */}
-      <section className="bg-slate-950 text-white py-20 border-y border-amber-900/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <span className="text-xs uppercase tracking-[0.3em] font-semibold text-amber-400">
-                L'Art du Savoir-Faire
-              </span>
-              <h2 className="font-serif text-3xl sm:text-5xl text-amber-50 font-normal leading-tight">
-                Peerless Craftsmanship, <br />
-                From Paris to the World
-              </h2>
-              <p className="text-sm text-slate-300 leading-relaxed font-light">
-                Every piece bearing the Maison Vendôme hallmark represents hundreds of hours of painstaking hand-craftsmanship by guild artisans in France, Switzerland, and Italy.
-              </p>
-              <ul className="space-y-4 pt-2 text-xs text-slate-300">
-                <li className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs flex-shrink-0">1</span>
-                  <span><strong>Master Horology Calibers:</strong> Assembled under 10x binocular magnification in Le Brassus, with hand-beveled bridges and black-polished tourbillon cages.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs flex-shrink-0">2</span>
-                  <span><strong>Full-Grain Tuscan Tannery:</strong> Hand-curried vegetable-tanned hides aged naturally with organic bark extracts for lifelong patina.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs flex-shrink-0">3</span>
-                  <span><strong>Archival Provenance:</strong> Each creation carries an individually engraved serial number registered forever in our private Place Vendôme ledger.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="relative rounded-3xl overflow-hidden border border-amber-500/20 shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80"
-                alt="Artisan Leather Crafting"
-                className="w-full aspect-[4/3] object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
-              <div className="absolute bottom-6 left-6 text-amber-200 font-serif italic text-sm">
-                "Perfection is not an accident; it is our solemn obligation."
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Quick View Modal */}
       {quickViewProduct && (
         <QuickViewModal
@@ -399,6 +369,37 @@ export const HomePage = () => {
           onClose={() => setQuickViewProduct(null)}
         />
       )}
+
+      {/* Atelier Experience Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950 text-white p-8 sm:p-14 border border-amber-500/20 shadow-2xl relative overflow-hidden">
+          <div className="max-w-2xl relative z-10 space-y-4">
+            <span className="text-xs uppercase tracking-[0.3em] font-semibold text-amber-300">
+              The Place Vendôme Salon
+            </span>
+            <h2 className="font-serif text-3xl sm:text-5xl font-normal tracking-tight">
+              Bespoke Commissions & Private Viewing
+            </h2>
+            <p className="text-sm text-slate-300 leading-relaxed font-light">
+              Experience the pinnacle of French craft. Schedule a private consultation at our Place Vendôme atelier or arrange for our traveling master horologist to visit your private residence.
+            </p>
+            <div className="pt-2 flex flex-wrap gap-4">
+              <Link
+                to="/products"
+                className="px-6 py-3 rounded-full bg-amber-400 text-slate-950 text-xs uppercase tracking-widest font-bold hover:bg-amber-300 transition-colors shadow"
+              >
+                Inquire With Salon
+              </Link>
+              <Link
+                to="/products"
+                className="px-6 py-3 rounded-full border border-amber-400/40 text-amber-200 text-xs uppercase tracking-widest font-semibold hover:bg-white/10 transition-colors"
+              >
+                Explore Catalogue
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
     </div>
   );
