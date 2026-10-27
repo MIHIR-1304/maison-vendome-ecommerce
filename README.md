@@ -1,4 +1,4 @@
-# Aura Luxury — Production Microservices E-Commerce Platform
+# Maison Vendôme Luxury — Production Microservices E-Commerce Platform
 
 A production-grade, distributed e-commerce web platform engineered with **Java 21**, **Spring Boot 3.3.5**, **PostgreSQL 16**, **Docker Compose**, **NGINX**, and a modern **React 18 + Vite + Tailwind CSS** frontend.
 
